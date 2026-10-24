@@ -9,6 +9,8 @@ from payments.payment_gateways.doctype.gocardless_settings.gocardless_settings i
 	gocardless_initialization,
 )
 
+from payments.utils.gateway_guard import gateway_required
+
 no_cache = 1
 
 expected_keys = ("redirect_flow_id", "reference_doctype", "reference_docname")
@@ -32,6 +34,7 @@ def get_context(context):
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("GoCardless")  # framework#285
 def confirm_payment(redirect_flow_id, reference_doctype, reference_docname):
 	client = gocardless_initialization(reference_docname)
 

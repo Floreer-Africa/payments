@@ -5,6 +5,8 @@ import frappe
 from frappe import _
 from frappe.utils import call_hook_method
 
+from payments.utils.gateway_guard import gateway_required
+
 SUPPORTED_WEBHOOK_EVENTS = {"refund.processed", "refund.failed"}
 
 
@@ -52,6 +54,7 @@ def process_webhook(raw_body: bytes, signature: str, event_id: str = "") -> str 
 # Razorpay is not a logged-in user, so this cannot be anything but a guest
 # endpoint. It authenticates on the HMAC signature before it writes anything.
 @frappe.whitelist(allow_guest=True, methods=["POST"])  # nosemgrep
+@gateway_required("Razorpay")  # framework#285
 def razorpay_webhook():
 	"""Answer 200 to anything Razorpay should not resend.
 

@@ -22,6 +22,8 @@ from paytmchecksum import generateSignature, verifySignature
 
 from payments.utils import create_payment_gateway
 
+from payments.utils.gateway_guard import gateway_required
+
 
 class PaytmSettings(Document):
 	supported_currencies = ("INR",)
@@ -105,6 +107,7 @@ def get_paytm_params(payment_details, order_id, paytm_config):
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("Paytm")  # framework#285
 def verify_transaction(**paytm_params):
 	"""Verify checksum for received data in the callback and then verify the transaction"""
 	paytm_config = get_paytm_config()

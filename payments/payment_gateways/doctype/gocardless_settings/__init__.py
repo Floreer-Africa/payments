@@ -8,8 +8,11 @@ import json
 
 import frappe
 
+from payments.utils.gateway_guard import gateway_required
+
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("GoCardless")  # framework#285
 def webhooks():
 	r = frappe.request
 	if not r:
