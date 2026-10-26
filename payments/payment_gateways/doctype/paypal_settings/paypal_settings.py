@@ -75,6 +75,8 @@ from frappe.utils.data import get_system_timezone
 
 from payments.utils import create_payment_gateway
 
+from payments.utils.gateway_guard import gateway_required
+
 api_path = "/api/method/payments.payment_gateways.doctype.paypal_settings.paypal_settings"
 
 
@@ -264,6 +266,7 @@ def setup_redirect(data, redirect_url, custom_redirect_to=None, redirect=True):
 
 
 @frappe.whitelist(allow_guest=True, xss_safe=True)
+@gateway_required("PayPal")  # framework#285
 def get_express_checkout_details(token):
 	try:
 		doc = frappe.get_doc("PayPal Settings")
@@ -302,6 +305,7 @@ def get_express_checkout_details(token):
 
 
 @frappe.whitelist(allow_guest=True, xss_safe=True)
+@gateway_required("PayPal")  # framework#285
 def confirm_payment(token):
 	try:
 		custom_redirect_to = None
@@ -349,6 +353,7 @@ def confirm_payment(token):
 
 
 @frappe.whitelist(allow_guest=True, xss_safe=True)
+@gateway_required("PayPal")  # framework#285
 def create_recurring_profile(token, payerid):
 	try:
 		custom_redirect_to = None
@@ -453,6 +458,7 @@ def manage_recurring_payment_profile_status(profile_id, action, args, url):
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("PayPal")  # framework#285
 def ipn_handler():
 	try:
 		data = frappe.local.form_dict

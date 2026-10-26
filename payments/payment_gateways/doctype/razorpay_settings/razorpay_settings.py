@@ -78,6 +78,8 @@ from frappe.utils import call_hook_method, cint, flt, get_timestamp, get_url
 
 from payments.utils import create_payment_gateway
 
+from payments.utils.gateway_guard import gateway_required
+
 
 def to_paise(amount: float) -> int:
 	"""Razorpay takes amounts as integer paise."""
@@ -624,6 +626,7 @@ def get_api_key():
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("Razorpay")  # framework#285
 def get_order(doctype, docname):
 	# Order returned to be consumed by razorpay.js
 	doc = frappe.get_doc(doctype, docname)
@@ -636,6 +639,7 @@ def get_order(doctype, docname):
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("Razorpay")  # framework#285
 def order_payment_success(integration_request, params):
 	"""Called by razorpay.js on order payment success, the params
 	contains razorpay_payment_id, razorpay_order_id, razorpay_signature
@@ -664,6 +668,7 @@ def order_payment_success(integration_request, params):
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("Razorpay")  # framework#285
 def order_payment_failure(integration_request, params):
 	"""Called by razorpay.js on failure
 
@@ -685,6 +690,7 @@ def convert_rupee_to_paisa(**kwargs):
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("Razorpay")  # framework#285
 def razorpay_subscription_callback():
 	try:
 		data = frappe.local.form_dict

@@ -8,6 +8,8 @@ from frappe.utils import cint, flt
 
 from payments.utils.utils import validate_integration_request
 
+from payments.utils.gateway_guard import gateway_required
+
 no_cache = 1
 
 expected_keys = (
@@ -64,6 +66,7 @@ def get_api_key():
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("Razorpay")  # framework#285
 def make_payment(razorpay_payment_id, options, reference_doctype, reference_docname, token):
 	data = {}
 

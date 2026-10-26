@@ -12,6 +12,8 @@ from payments.payment_gateways.doctype.braintree_settings.braintree_settings imp
 	get_gateway_controller,
 )
 
+from payments.utils.gateway_guard import gateway_required
+
 no_cache = 1
 
 expected_keys = (
@@ -52,6 +54,7 @@ def get_context(context):
 
 
 @frappe.whitelist(allow_guest=True)
+@gateway_required("Braintree")  # framework#285
 def make_payment(payload_nonce, data, reference_doctype, reference_docname):
 	data = json.loads(data)
 

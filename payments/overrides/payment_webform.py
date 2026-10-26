@@ -66,6 +66,14 @@ def accept(web_form, data, docname=None, for_payment=False):
 	files_to_delete = []
 
 	web_form = frappe.get_doc("Web Form", web_form)
+	# PR-Foundry fork patch (framework#287). Frappe's own accept checks the form is published
+	# and writes the form's doctype, never the caller's. Without both, a guest could submit
+	# through any web form, published or not, and insert any doctype that shares one of its
+	# fieldnames, with ignore_permissions.
+	web_form.raise_if_unpublished()
+	if data.get("doctype") and data.doctype != web_form.doc_type:
+		frappe.throw(frappe._("Not permitted"), frappe.PermissionError)
+	data.doctype = web_form.doc_type
 
 	if docname and not web_form.allow_edit:
 		frappe.throw(frappe._("You are not allowed to update this Web Form Document"))
